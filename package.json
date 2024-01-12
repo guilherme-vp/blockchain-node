@@ -1,0 +1,24 @@
+{
+  "name": "blockchain",
+  "version": "1.0.0",
+  "main": "index.js",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "test": "node --import tsx --test",
+    "start": "tsx src/",
+    "format": "pnpm dlx @biomejs/biome format src/ --write",
+    "lint": "pnpm dlx @biomejs/biome lint --apply-unsafe src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "author": "Guilherme Vieira de Paiva",
+  "license": "ISC",
+  "devDependencies": {
+    "@biomejs/biome": "^1.5.1",
+    "@types/node": "^20.11.0",
+    "nodemon": "^3.0.2",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
