@@ -63,7 +63,7 @@ export class Blockchain {
 			nonce: 0,
 		};
 
-		console.log(`Bloco #${payload.sequence} criado!`);
+		console.log(`Block #${payload.sequence} created!`);
 
 		return {
 			header,
@@ -84,6 +84,8 @@ export class Blockchain {
 		while (true) {
 			const hashProof = hash(hashBlock + nonce);
 
+			console.log(`Try nº: ${nonce} - Hash: ${hashProof}`)
+
 			if (
 				isHashValid({
 					hash: hashProof,
@@ -96,9 +98,9 @@ export class Blockchain {
 				const mineTime = (endAt - startAt) / 1000;
 
 				console.log(
-					`Bloco #${block.payload.sequence} minerado em ${mineTime} segundos!`,
+					`Block #${block.payload.sequence} mined in ${mineTime} seconds!`,
 				);
-				console.log(`Hash reduzido: ${shortHash} - (${nonce} tentativas)`);
+				console.log(`Short hash: ${shortHash} - (${nonce} tries)`);
 
 				return {
 					minedBlock: {
@@ -118,7 +120,7 @@ export class Blockchain {
 	public verifyBlock(block: Block): boolean {
 		if (block.payload.previousHash !== this.hashLastBlock) {
 			console.error(
-				`Bloco #${block.payload.sequence} rejeitado: hash anterior inválido!`,
+				`Block #${block.payload.sequence} rejected: Previous hash ${block.payload.previousHash} invalid!`,
 			);
 			return false;
 		}
@@ -133,7 +135,7 @@ export class Blockchain {
 			})
 		) {
 			console.error(
-				`Bloco #${block.payload.sequence} rejeitado: Nonce ${block.header.nonce} inválido!`,
+				`Block #${block.payload.sequence} rejected: Nonce ${block.header.nonce} invalid!`,
 			);
 			return false;
 		}
@@ -145,9 +147,9 @@ export class Blockchain {
 		if (this.verifyBlock(block)) {
 			this.#chain.push(block);
 			console.log(
-				`Bloco #${
+				`Block #${
 					block.payload.sequence
-				} adicionado à Blockchain: ${JSON.stringify(block, null, 2)}!`,
+				} added to the chain: ${JSON.stringify(block, null, 2)}!`,
 			);
 		}
 		return this.#chain;
