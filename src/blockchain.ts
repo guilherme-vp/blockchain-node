@@ -15,7 +15,7 @@ export interface Block {
 
 export class Blockchain {
 	#chain: Block[] = [];
-	private prefixPow = "0".repeat(this.difficulty);
+	private prefixPow = "0";
 
 	constructor(private readonly difficulty: number = 4) {
 		this.#chain.push(this.genesisBlock());
@@ -51,40 +51,33 @@ export class Blockchain {
 		return this.#chain;
 	}
 
-	public createBlock(data: unknown): Block {
+	public createBlock(data: unknown): Block["payload"] {
 		const payload: Block["payload"] = {
 			sequence: this.lastBlock.payload.sequence + 1,
 			timestamp: Date.now(),
 			data,
 			previousHash: this.hashLastBlock,
 		};
-		const header: Block["header"] = {
-			hash: hash(JSON.stringify(payload)),
-			nonce: 0,
-		};
 
 		console.log(`Block #${payload.sequence} created!`);
 
-		return {
-			header,
-			payload,
-		};
+		return payload;
 	}
 
-	public mineBlock(block: Block): {
+	public mineBlock(block: Block["payload"]): {
 		minedBlock: Block;
 		minedHash: string;
 		shortHash: string;
 		mineTime: number;
 	} {
 		let nonce = 0;
-		const hashBlock = hash(JSON.stringify(block.payload));
+		const hashBlock = hash(JSON.stringify(block));
 		const startAt = Date.now();
 
 		while (true) {
 			const hashProof = hash(hashBlock + nonce);
 
-			console.log(`Try nº: ${nonce} - Hash: ${hashProof}`)
+			console.log(`Try nº: ${nonce} - Hash: ${hashProof}`);
 
 			if (
 				isHashValid({
@@ -97,14 +90,12 @@ export class Blockchain {
 				const shortHash = hashBlock.slice(0, this.difficulty);
 				const mineTime = (endAt - startAt) / 1000;
 
-				console.log(
-					`Block #${block.payload.sequence} mined in ${mineTime} seconds!`,
-				);
+				console.log(`Block #${block.sequence} mined in ${mineTime} seconds!`);
 				console.log(`Short hash: ${shortHash} - (${nonce} tries)`);
 
 				return {
 					minedBlock: {
-						payload: block.payload,
+						payload: block,
 						header: { hash: hashProof, nonce },
 					},
 					minedHash: hashProof,
@@ -144,12 +135,15 @@ export class Blockchain {
 	}
 
 	public addBlock(block: Block): Block[] {
+		console.log(`Block #${block.payload.sequence} received!`);
 		if (this.verifyBlock(block)) {
 			this.#chain.push(block);
 			console.log(
-				`Block #${
-					block.payload.sequence
-				} added to the chain: ${JSON.stringify(block, null, 2)}!`,
+				`Block #${block.payload.sequence} added to the chain: ${JSON.stringify(
+					block,
+					null,
+					2,
+				)}!`,
 			);
 		}
 		return this.#chain;
